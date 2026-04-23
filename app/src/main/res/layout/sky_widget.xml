@@ -1,55 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  DIAGNOSTIC LAYOUT — STEP 2
-  Added: H/L, sunrise, sunset, daylight as plain TextViews, stacked vertically.
-  Still no icons, no column layout, no gradient. Single LinearLayout vertical.
-  Purpose: verify that multiple TextViews in a LinearLayout render in RemoteViews.
+  DIAGNOSTIC LAYOUT — STEP 3
+  Added: 3-column horizontal LinearLayout structure using nested LinearLayouts
+  and layout_weight for the right column. Still no icons, no gradient.
+
+  Column 1: temp + H/L (vertical)
+  Column 2: condition text placeholder (vertical; icon goes here next step)
+  Column 3: sunrise/sunset/daylight (vertical, weight=1 to fill remaining)
+
+  Purpose: verify nested LinearLayouts + layout_weight render in RemoteViews.
+  If this breaks, the full layout's flexbox-style column structure is the culprit.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:background="#4A9BCF"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:baselineAligned="false">
 
-    <TextView
-        android:id="@+id/temp_now"
+    <!-- Column 1: temp + H/L stacked -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textColor="#FFFFFF"
-        android:text="loading" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:id="@+id/temp_hl"
+        <TextView
+            android:id="@+id/temp_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="36sp"
+            android:textColor="#FFFFFF"
+            android:text="18°" />
+
+        <TextView
+            android:id="@+id/temp_hl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:text="21° / 9°" />
+    </LinearLayout>
+
+    <!-- Column 2: condition placeholder (icon goes here in step 4) -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textColor="#FFFFFF"
-        android:text="—" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginStart="14dp">
 
-    <TextView
-        android:id="@+id/sunrise"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textColor="#FFFFFF"
-        android:text="—" />
+        <TextView
+            android:id="@+id/cond_placeholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:text="cond" />
 
-    <TextView
-        android:id="@+id/sunset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textColor="#FFFFFF"
-        android:text="—" />
+        <TextView
+            android:id="@+id/chips_placeholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:text="chips" />
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/daylight"
-        android:layout_width="wrap_content"
+    <!-- Column 3: sun stats, weight=1 to claim remaining width, left-aligned -->
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textColor="#FFFFFF"
-        android:text="—" />
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="start|center_vertical"
+        android:layout_marginStart="14dp">
+
+        <TextView
+            android:id="@+id/sunrise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:text="—" />
+
+        <TextView
+            android:id="@+id/sunset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:text="—" />
+
+        <TextView
+            android:id="@+id/daylight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:text="—" />
+    </LinearLayout>
 
 </LinearLayout>
