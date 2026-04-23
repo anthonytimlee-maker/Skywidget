@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Full-backup rules (Android 6+ legacy). We exclude the location cache
+     because a device restore on a new phone shouldn't bring along stale
+     coordinates from the old device. -->
+<full-backup-content>
+    <exclude domain="sharedpref" path="sky_widget_prefs.xml" />
+</full-backup-content>

@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Small crescent moon, upper left. -->
+    <path
+        android:pathData="M22,8 C25,10 27,13.5 27,17.5 C27,22.5 23,26.5 18,26.5 C16,26.5 14,26 12.5,25 C13.5,18 17.5,12 22,8 Z"
+        android:fillColor="#E8E4D9" />
+    <!-- Cloud, lower right. -->
+    <path
+        android:pathData="M15,32 Q15,26 21,26 Q23,22 28,24 Q34,23 36,29 Q40,29 40,33 Q40,36 36,36 L17,36 Q13,36 13,33 Q13,31 15,32 Z"
+        android:fillColor="#FFFFFF" />
+</vector>

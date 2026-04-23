@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Upper cloud, darker. -->
+    <path
+        android:pathData="M12,20 Q12,14 18,14 Q20,10 25,12 Q31,11 33,17 Q37,17 37,21 Q37,24 33,24 L14,24 Q10,24 10,21 Q10,19 12,20 Z"
+        android:fillColor="#C7C7D0" />
+    <!-- Lower cloud, lighter and offset. -->
+    <path
+        android:pathData="M18,34 Q18,28 24,28 Q26,24 31,26 Q37,25 39,31 Q43,31 43,35 Q43,38 39,38 L20,38 Q16,38 16,35 Q16,33 18,34 Z"
+        android:fillColor="#FFFFFF" />
+</vector>

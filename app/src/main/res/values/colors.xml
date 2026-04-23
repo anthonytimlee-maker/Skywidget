@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Placeholder color used before first widget paint if something goes wrong
+         before the renderer runs. Matches the "noon" sky gradient top color. -->
+    <color name="widget_placeholder_bg">#4A9BCF</color>
+</resources>

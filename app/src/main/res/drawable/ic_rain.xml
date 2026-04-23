@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Cloud. -->
+    <path
+        android:pathData="M12,20 Q12,14 18,14 Q20,10 25,12 Q31,11 33,17 Q37,17 37,21 Q37,24 33,24 L14,24 Q10,24 10,21 Q10,19 12,20 Z"
+        android:fillColor="#FFFFFF" />
+    <!-- Three raindrops. -->
+    <path
+        android:pathData="M16,30 L14,36 L18,36 Z"
+        android:fillColor="#78B6E8" />
+    <path
+        android:pathData="M24,32 L22,40 L26,40 Z"
+        android:fillColor="#78B6E8" />
+    <path
+        android:pathData="M32,30 L30,36 L34,36 Z"
+        android:fillColor="#78B6E8" />
+</vector>

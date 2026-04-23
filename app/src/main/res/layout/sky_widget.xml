@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  DIAGNOSTIC LAYOUT — STEP 2
+  Added: H/L, sunrise, sunset, daylight as plain TextViews, stacked vertically.
+  Still no icons, no column layout, no gradient. Single LinearLayout vertical.
+  Purpose: verify that multiple TextViews in a LinearLayout render in RemoteViews.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#4A9BCF"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/temp_now"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textColor="#FFFFFF"
+        android:text="loading" />
+
+    <TextView
+        android:id="@+id/temp_hl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="#FFFFFF"
+        android:text="—" />
+
+    <TextView
+        android:id="@+id/sunrise"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="#FFFFFF"
+        android:text="—" />
+
+    <TextView
+        android:id="@+id/sunset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="#FFFFFF"
+        android:text="—" />
+
+    <TextView
+        android:id="@+id/daylight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="#FFFFFF"
+        android:text="—" />
+
+</LinearLayout>

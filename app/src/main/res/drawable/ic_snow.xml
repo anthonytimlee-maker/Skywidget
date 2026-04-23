@@ -1,0 +1,28 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Cloud. -->
+    <path
+        android:pathData="M12,20 Q12,14 18,14 Q20,10 25,12 Q31,11 33,17 Q37,17 37,21 Q37,24 33,24 L14,24 Q10,24 10,21 Q10,19 12,20 Z"
+        android:fillColor="#FFFFFF" />
+    <!-- Three snowflakes as six-pointed asterisks. -->
+    <group>
+        <path
+            android:pathData="M16,31 L16,39 M12,33 L20,37 M12,37 L20,33"
+            android:strokeColor="#E8F4FF"
+            android:strokeWidth="1.8"
+            android:strokeLineCap="round" />
+        <path
+            android:pathData="M24,33 L24,42 M20,35.5 L28,39.5 M20,39.5 L28,35.5"
+            android:strokeColor="#E8F4FF"
+            android:strokeWidth="1.8"
+            android:strokeLineCap="round" />
+        <path
+            android:pathData="M32,31 L32,39 M28,33 L36,37 M28,37 L36,33"
+            android:strokeColor="#E8F4FF"
+            android:strokeWidth="1.8"
+            android:strokeLineCap="round" />
+    </group>
+</vector>

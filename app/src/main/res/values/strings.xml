@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sky Widget</string>
+
+    <string name="widget_description">A 3×1 weather widget with a sky-color background that shifts with the sun.</string>
+
+    <string name="config_title">Sky Widget</string>
+    <string name="config_description">Choose how the widget gets your location. You can change this later by long-pressing the widget and tapping the settings icon.</string>
+    <string name="config_use_device">Use my device location</string>
+    <string name="config_status_using_device">Using device location.</string>
+    <string name="config_manual_heading">Enter coordinates manually</string>
+    <string name="config_manual_hint">If you prefer not to grant location permission, enter your latitude and longitude here. Decimal degrees, negative for south/west.</string>
+    <string name="config_latitude_hint">Latitude (-90 to 90)</string>
+    <string name="config_longitude_hint">Longitude (-180 to 180)</string>
+    <string name="config_save_manual">Save coordinates</string>
+
+    <!-- Content descriptions for accessibility. -->
+    <string name="cd_current_temp">Current temperature</string>
+    <string name="cd_high_low">Today\'s high and low</string>
+    <string name="cd_weather_icon">Current weather condition</string>
+    <string name="cd_baro_trend">Barometer trend</string>
+</resources>

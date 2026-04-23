@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark variant. Since DayNight already picks a dark base theme at night,
+         the only reason to override here is if we want night-specific accent
+         colors. Kept explicit so future tweaks are obvious. -->
+    <style name="Theme.SkyWidget" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+    </style>
+    <style name="Theme.SkyWidget.Config" parent="Theme.SkyWidget" />
+</resources>
