@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  DIAGNOSTIC LAYOUT — STEP 3
-  Added: 3-column horizontal LinearLayout structure using nested LinearLayouts
-  and layout_weight for the right column. Still no icons, no gradient.
+  DIAGNOSTIC LAYOUT — STEP 4
+  Added: weather icon as an ImageView in column 2, using a vector drawable.
+  Still no small icons for the stats, no gradient.
 
-  Column 1: temp + H/L (vertical)
-  Column 2: condition text placeholder (vertical; icon goes here next step)
-  Column 3: sunrise/sunset/daylight (vertical, weight=1 to fill remaining)
-
-  Purpose: verify nested LinearLayouts + layout_weight render in RemoteViews.
-  If this breaks, the full layout's flexbox-style column structure is the culprit.
+  Purpose: verify that vector drawables inflate in RemoteViews ImageViews.
+  If this breaks, we know it's a vector-drawable issue specifically.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -44,7 +40,7 @@
             android:text="21° / 9°" />
     </LinearLayout>
 
-    <!-- Column 2: condition placeholder (icon goes here in step 4) -->
+    <!-- Column 2: weather icon (+ chips placeholder below for now) -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,13 +48,12 @@
         android:gravity="center_horizontal"
         android:layout_marginStart="14dp">
 
-        <TextView
-            android:id="@+id/cond_placeholder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textColor="#FFFFFF"
-            android:text="cond" />
+        <ImageView
+            android:id="@+id/ico_weather"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@drawable/ic_partly_cloudy_day"
+            android:contentDescription="@string/cd_weather_icon" />
 
         <TextView
             android:id="@+id/chips_placeholder"
