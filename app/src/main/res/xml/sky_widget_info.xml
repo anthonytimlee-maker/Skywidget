@@ -2,20 +2,19 @@
 <!--
   Widget provider metadata.
 
-  - minWidth/minHeight define the 3x1 cell default. Android sometimes places
-    widgets at one cell above the minimum, so we stay under the 270/110 ceiling.
-  - resizeMode=horizontal|vertical lets the user stretch the widget, though
-    the layout isn't optimized for other sizes yet (Stage 4c+ territory).
-  - configure points at our ConfigActivity so a first-time setup screen appears.
-  - updatePeriodMillis=0 because we drive our own refresh via WorkManager —
-    using Android's built-in update period would override our 15-min cadence.
+  - minWidth/minHeight: 4x1 cell footprint. Android's cell-counting formula
+    ((dp + 30) / 70, round up) gives 4 cells wide at 250dp, 1 cell tall at 40dp.
+  - targetCellWidth/Height: exact 4x1 for API 31+ launchers that honor it.
+  - minResize*: lowered so users can shrink the widget to 3x1 via long-press drag.
+  - resizeMode: both axes allowed.
+  - updatePeriodMillis=0 because WorkManager drives our 15-min refresh.
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="270dp"
-    android:minHeight="110dp"
-    android:minResizeWidth="270dp"
-    android:minResizeHeight="110dp"
-    android:targetCellWidth="3"
+    android:minWidth="250dp"
+    android:minHeight="40dp"
+    android:minResizeWidth="180dp"
+    android:minResizeHeight="40dp"
+    android:targetCellWidth="4"
     android:targetCellHeight="1"
     android:updatePeriodMillis="0"
     android:previewLayout="@layout/sky_widget"
