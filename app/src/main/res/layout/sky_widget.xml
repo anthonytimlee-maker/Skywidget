@@ -1,171 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  DIAGNOSTIC LAYOUT — STEP 5
-  Added: small stat icons next to sunrise/sunset/daylight, plus precip drop
-  and barometer arrow chips under the weather icon.
+  DIAGNOSTIC LAYOUT — STEP 6
+  Added: FrameLayout root wrapping a background ImageView (painted by the
+  renderer as a runtime-generated bitmap gradient) and the content row
+  above it.
 
-  Each stat row is now a horizontal LinearLayout containing an ImageView
-  and a TextView side-by-side. Same for the chip row in column 2.
-
-  Purpose: verify multiple small ImageViews + horizontal LinearLayouts
-  nested inside vertical ones. This is where RemoteViews layouts typically
-  start to get exotic.
+  Purpose: verify that setImageViewBitmap works on a full-bleed ImageView
+  in RemoteViews, and that FrameLayout with two children (image + linear
+  layout) renders correctly.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:background="#4A9BCF"
-    android:padding="8dp"
-    android:baselineAligned="false">
+    android:layout_height="match_parent">
 
-    <!-- Column 1: temp + H/L stacked -->
+    <!-- Background: dynamically-painted gradient bitmap. -->
+    <ImageView
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no" />
+
+    <!-- Content row, same as Step 5 but with the solid-color background removed
+         (the gradient image below provides the color now). -->
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:baselineAligned="false">
 
-        <TextView
-            android:id="@+id/temp_now"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="36sp"
-            android:textColor="#FFFFFF"
-            android:text="18°" />
-
-        <TextView
-            android:id="@+id/temp_hl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textColor="#FFFFFF"
-            android:text="21° / 9°" />
-    </LinearLayout>
-
-    <!-- Column 2: weather icon + precip/baro chips -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:layout_marginStart="14dp">
-
-        <ImageView
-            android:id="@+id/ico_weather"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:src="@drawable/ic_partly_cloudy_day"
-            android:contentDescription="@string/cd_weather_icon" />
-
-        <!-- Chip row: precip drop + % and barometer arrow -->
+        <!-- Column 1: temp + H/L stacked -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="2dp">
-
-            <ImageView
-                android:layout_width="11dp"
-                android:layout_height="11dp"
-                android:src="@drawable/ic_precip"
-                android:contentDescription="@null" />
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
             <TextView
-                android:id="@+id/precip_pct"
+                android:id="@+id/temp_now"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="36sp"
+                android:textColor="#FFFFFF"
+                android:text="18°" />
+
+            <TextView
+                android:id="@+id/temp_hl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="11sp"
                 android:textColor="#FFFFFF"
-                android:layout_marginStart="3dp"
-                android:text="20%" />
+                android:text="21° / 9°" />
+        </LinearLayout>
+
+        <!-- Column 2: weather icon + chips -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="14dp">
 
             <ImageView
-                android:id="@+id/ico_baro"
-                android:layout_width="13dp"
-                android:layout_height="13dp"
-                android:src="@drawable/ic_baro_flat"
-                android:layout_marginStart="6dp"
-                android:contentDescription="@string/cd_baro_trend" />
+                android:id="@+id/ico_weather"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:src="@drawable/ic_partly_cloudy_day"
+                android:contentDescription="@string/cd_weather_icon" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="2dp">
+
+                <ImageView
+                    android:layout_width="11dp"
+                    android:layout_height="11dp"
+                    android:src="@drawable/ic_precip"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/precip_pct"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginStart="3dp"
+                    android:text="20%" />
+
+                <ImageView
+                    android:id="@+id/ico_baro"
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
+                    android:src="@drawable/ic_baro_flat"
+                    android:layout_marginStart="6dp"
+                    android:contentDescription="@string/cd_baro_trend" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Column 3: sun stats -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="start|center_vertical"
+            android:layout_marginStart="14dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:layout_width="11dp"
+                    android:layout_height="11dp"
+                    android:src="@drawable/ic_sunrise"
+                    android:contentDescription="@null" />
+                <TextView
+                    android:id="@+id/sunrise"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginStart="5dp"
+                    android:text="—" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="3dp">
+                <ImageView
+                    android:layout_width="11dp"
+                    android:layout_height="11dp"
+                    android:src="@drawable/ic_sunset"
+                    android:contentDescription="@null" />
+                <TextView
+                    android:id="@+id/sunset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginStart="5dp"
+                    android:text="—" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="3dp">
+                <ImageView
+                    android:layout_width="11dp"
+                    android:layout_height="11dp"
+                    android:src="@drawable/ic_daylight"
+                    android:contentDescription="@null" />
+                <TextView
+                    android:id="@+id/daylight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginStart="5dp"
+                    android:text="—" />
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Column 3: sun stats, each row is icon + text -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="start|center_vertical"
-        android:layout_marginStart="14dp">
-
-        <!-- Sunrise row -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-            <ImageView
-                android:layout_width="11dp"
-                android:layout_height="11dp"
-                android:src="@drawable/ic_sunrise"
-                android:contentDescription="@null" />
-            <TextView
-                android:id="@+id/sunrise"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginStart="5dp"
-                android:text="—" />
-        </LinearLayout>
-
-        <!-- Sunset row -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="3dp">
-            <ImageView
-                android:layout_width="11dp"
-                android:layout_height="11dp"
-                android:src="@drawable/ic_sunset"
-                android:contentDescription="@null" />
-            <TextView
-                android:id="@+id/sunset"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginStart="5dp"
-                android:text="—" />
-        </LinearLayout>
-
-        <!-- Daylight row -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="3dp">
-            <ImageView
-                android:layout_width="11dp"
-                android:layout_height="11dp"
-                android:src="@drawable/ic_daylight"
-                android:contentDescription="@null" />
-            <TextView
-                android:id="@+id/daylight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginStart="5dp"
-                android:text="—" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>
