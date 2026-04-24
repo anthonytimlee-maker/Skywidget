@@ -10,30 +10,39 @@ import com.anthony.skywidget.data.BarometerTrend
 import com.anthony.skywidget.data.WeatherCode
 
 /**
- * DIAGNOSTIC RENDERER — STEP 6
+ * Final renderer.
  *
- * Added: gradient bitmap painted onto the background ImageView via
- * setImageViewBitmap. This is the final mechanism to verify — if it works,
- * we've proven the full layout approach and can move to Step 7 (polish
- * and original-layout restoration).
- *
- * Still no color filters on icons/text (those come in Step 7).
+ * Everything from Step 6 plus:
+ *  - Dynamic text color driven by state.textArgb (dark on bright skies,
+ *    light on dark skies; transitions around civil twilight).
+ *  - ColorFilter applied to all tintable icons via RemoteViews.setInt so
+ *    the vector strokes stay legible against any sky gradient.
  */
 object WidgetRenderer {
 
     private const val GRADIENT_BITMAP_W = 540
     private const val GRADIENT_BITMAP_H = 220
 
+    // IDs we need to re-color at paint time.
+    private val TEXT_IDS = intArrayOf(
+        R.id.temp_now, R.id.temp_hl, R.id.precip_pct,
+        R.id.sunrise, R.id.sunset, R.id.daylight
+    )
+    private val TINTABLE_ICON_IDS = intArrayOf(
+        R.id.ico_precip, R.id.ico_baro,
+        R.id.ico_sunrise, R.id.ico_sunset, R.id.ico_daylight
+    )
+
     fun build(context: Context, state: WidgetState): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.sky_widget)
 
-        // Background gradient — dynamic bitmap painted with the state's sky colors.
+        // Background gradient.
         views.setImageViewBitmap(
             R.id.background,
             buildGradientBitmap(state.topGradientArgb, state.botGradientArgb)
         )
 
-        // Text values
+        // Text content.
         views.setTextViewText(R.id.temp_now, "${state.temperatureC}°")
         views.setTextViewText(R.id.temp_hl, "${state.highC}° / ${state.lowC}°")
         views.setTextViewText(R.id.precip_pct, "${state.precipPct}%")
@@ -41,7 +50,19 @@ object WidgetRenderer {
         views.setTextViewText(R.id.sunset, state.sunsetHhMm12)
         views.setTextViewText(R.id.daylight, state.daylightText)
 
-        // Dynamic icon swaps
+        // Dynamic text colors — dark for bright skies, light for dark skies.
+        for (id in TEXT_IDS) {
+            views.setTextColor(id, state.textArgb)
+        }
+
+        // Tint the small icons to match. The hero weather icon keeps its
+        // authored colors (yellow sun, white cloud, etc.) — tinting it would
+        // flatten it into a silhouette.
+        for (id in TINTABLE_ICON_IDS) {
+            views.setInt(id, "setColorFilter", state.textArgb)
+        }
+
+        // Dynamic icon swaps.
         views.setImageViewResource(R.id.ico_weather, iconForCondition(state.condition, state.isDaytime))
         views.setImageViewResource(R.id.ico_baro, barometerIcon(state.barometer))
 
