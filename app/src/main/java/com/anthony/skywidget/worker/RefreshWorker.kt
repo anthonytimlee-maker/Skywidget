@@ -17,6 +17,7 @@ import com.anthony.skywidget.sky.SkyPalette
 import com.anthony.skywidget.widget.SkyWidgetProvider
 import com.anthony.skywidget.widget.WidgetRenderer
 import com.anthony.skywidget.widget.WidgetState
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
@@ -24,15 +25,10 @@ import kotlin.math.roundToInt
 /**
  * Assembles widget state from live data and repaints every mounted widget.
  *
- * Lives in a [CoroutineWorker] so the network call runs off the main thread.
- * WorkManager persists the schedule across reboots and handles backoff on
- * network failures automatically.
- *
- * Failure handling: on any failure we return [Result.retry] rather than
- * [Result.failure] — this tells WorkManager to try again with exponential
- * backoff instead of giving up. The widget keeps showing its last successful
- * render in the meantime; it only goes blank on first launch before any
- * successful fetch.
+ * Uses the timezone returned by Open-Meteo for the requested location, NOT
+ * the phone's timezone. Otherwise a manually-set Sydney widget shown from
+ * Vancouver would display sunrise as "1:24 PM" (actual Sydney sunrise
+ * shifted by a 17h offset).
  */
 class RefreshWorker(
     context: Context,
@@ -44,17 +40,21 @@ class RefreshWorker(
         return try {
             val loc = LocationResolver(applicationContext).resolve()
             if (loc == null) {
-                Log.w(TAG, "No location available (permission denied and no cache); skipping.")
-                // Paint a distinct sentinel so we can tell "no location" apart
-                // from a real 0° reading. During diagnostic phase this makes
-                // failures visible; Stage 4c will replace with a proper error UI.
+                Log.w(TAG, "No location available; painting sentinel.")
                 paintAll(WidgetState.Loading.copy(temperatureC = -99))
                 return Result.success()
             }
             Log.d(TAG, "Location resolved: ${loc.lat}, ${loc.lon} (source=${loc.source})")
 
             val snapshot = OpenMeteoClient.fetch(loc.lat, loc.lon)
-            val now = ZonedDateTime.now()
+
+            // Resolve the timezone of the requested location, with a robust
+            // fallback chain so a malformed server response never crashes the
+            // widget — worst case we fall back to the phone's zone, which is
+            // the same as before the fix.
+            val locationZone = resolveZone(snapshot.timezoneId)
+            val now = ZonedDateTime.now(locationZone)
+            Log.d(TAG, "Using zone=${locationZone.id} (server reported ${snapshot.timezoneId})")
 
             val altDeg = SolarCalc.altitudeDeg(now, loc.lat, loc.lon)
             val events = SolarCalc.riseSet(now, loc.lat, loc.lon)
@@ -69,10 +69,11 @@ class RefreshWorker(
                 lowC = snapshot.dailyLowC.roundToInt(),
                 precipPct = snapshot.precipProbabilityPct ?: 0,
                 condition = WeatherCode.categorize(snapshot.weatherCode),
-                isDaytime = altDeg > -6.0,   // civil twilight threshold
+                isDaytime = altDeg > -6.0,
                 barometer = baro.trend,
-                sunriseHhMm12 = events.sunrise?.format(TIME_FMT) ?: "—",
-                sunsetHhMm12 = events.sunset?.format(TIME_FMT) ?: "—",
+                // Ensure sunrise/sunset are formatted in the LOCATION's zone.
+                sunriseHhMm12 = events.sunrise?.withZoneSameInstant(locationZone)?.format(TIME_FMT) ?: "—",
+                sunsetHhMm12 = events.sunset?.withZoneSameInstant(locationZone)?.format(TIME_FMT) ?: "—",
                 daylightText = daylightText(events),
                 topGradientArgb = gradient.topArgb,
                 botGradientArgb = gradient.botArgb,
@@ -85,6 +86,21 @@ class RefreshWorker(
         } catch (e: Exception) {
             Log.w(TAG, "RefreshWorker failed: ${e.message}", e)
             Result.retry()
+        }
+    }
+
+    /**
+     * Turn the server-supplied zone string into a ZoneId. If the string is
+     * unrecognized, blank, or "UTC", fall back to the system default — which
+     * at worst reproduces the old bug for that one run, rather than crashing.
+     */
+    private fun resolveZone(id: String?): ZoneId {
+        if (id.isNullOrBlank()) return ZoneId.systemDefault()
+        return try {
+            ZoneId.of(id)
+        } catch (e: Exception) {
+            Log.w(TAG, "Unrecognized zone '$id', falling back to system default")
+            ZoneId.systemDefault()
         }
     }
 
