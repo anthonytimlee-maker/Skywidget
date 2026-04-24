@@ -14,15 +14,19 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 /**
- * Location resolution with three-tier fallback:
+ * Location resolution with two modes:
  *
- *  1. Live fused location, if permission is granted and a recent fix is available.
- *  2. Last known cached location (persisted in SharedPreferences from the last
- *     successful fix or manual entry).
- *  3. Null — caller is expected to show the config activity so the user can
- *     enter coordinates manually.
+ *  - AUTO: use device fused location, fall back to cached last-known,
+ *          fall back to null.
+ *  - MANUAL: use the explicitly-saved coordinates, never override with
+ *           live device location.
  *
- * This matches the Stage 4a HTML behavior exactly.
+ * The mode is set by which method the user calls:
+ *   - saveManual(lat, lon) → MANUAL
+ *   - useDeviceLocation()  → AUTO
+ *
+ * This prevents the previous bug where entering a manual Sydney location
+ * was silently overwritten by the live Vancouver fix on next refresh.
  */
 class LocationResolver(private val context: Context) {
 
@@ -32,6 +36,16 @@ class LocationResolver(private val context: Context) {
 
     /** Entry point. Returns best available location, or null if we have nothing. */
     suspend fun resolve(): Resolved? {
+        val mode = prefs.getString(KEY_MODE, MODE_AUTO) ?: MODE_AUTO
+        Log.d(TAG, "resolve() mode=$mode")
+
+        if (mode == MODE_MANUAL) {
+            // User explicitly set coordinates; honor them and do not overwrite.
+            val manual = readCache() ?: return null
+            return Resolved(manual.first, manual.second, Source.MANUAL)
+        }
+
+        // AUTO mode: try live, fall back to cache.
         val live = tryLiveLocation()
         if (live != null) {
             saveCache(live.lat, live.lon)
@@ -42,9 +56,23 @@ class LocationResolver(private val context: Context) {
         return null
     }
 
-    /** Persists manual coordinates entered via the config activity. */
+    /** Persist manual coordinates and switch to MANUAL mode. */
     fun saveManual(lat: Double, lon: Double) {
-        saveCache(lat, lon)
+        prefs.edit()
+            .putString(KEY_MODE, MODE_MANUAL)
+            .putString(KEY_LAT, lat.toString())
+            .putString(KEY_LON, lon.toString())
+            .putLong(KEY_SAVED_AT, System.currentTimeMillis())
+            .apply()
+        Log.d(TAG, "saveManual: $lat, $lon (mode=MANUAL)")
+    }
+
+    /** Switch to AUTO mode, causing next resolve() to use live device location. */
+    fun useDeviceLocation() {
+        prefs.edit()
+            .putString(KEY_MODE, MODE_AUTO)
+            .apply()
+        Log.d(TAG, "useDeviceLocation: mode=AUTO")
     }
 
     private fun hasPermission(): Boolean {
@@ -59,11 +87,6 @@ class LocationResolver(private val context: Context) {
             Log.d(TAG, "Location permission not granted; skipping live fix.")
             return null
         }
-
-        // Try getLastLocation() first — it returns instantly if Google Play
-        // Services has any cached location from this or any other app. Much
-        // more reliable in WorkManager background contexts where
-        // getCurrentLocation() often returns null without a recent fix.
         val last = tryLastLocation()
         if (last != null) {
             Log.d(TAG, "Resolved from getLastLocation(): ${last.lat}, ${last.lon}")
@@ -73,9 +96,6 @@ class LocationResolver(private val context: Context) {
 
         return suspendCancellableCoroutine { cont ->
             val cts = CancellationTokenSource()
-            // PRIORITY_BALANCED_POWER_ACCURACY: city-block-level accuracy without
-            // waking the GPS chip. More than enough for sunrise/sunset math —
-            // 100 m of error shifts sunrise by well under a second.
             fused.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
                 .addOnSuccessListener { loc ->
                     if (loc == null) Log.w(TAG, "getCurrentLocation returned null (no fix available)")
@@ -115,14 +135,17 @@ class LocationResolver(private val context: Context) {
 
     private data class LatLon(val lat: Double, val lon: Double)
 
-    enum class Source { LIVE, CACHED }
+    enum class Source { LIVE, CACHED, MANUAL }
     data class Resolved(val lat: Double, val lon: Double, val source: Source)
 
     companion object {
         private const val TAG = "LocationResolver"
         private const val PREFS_NAME = "sky_widget_prefs"
+        const val KEY_MODE = "loc_mode"
         const val KEY_LAT = "loc_lat"
         const val KEY_LON = "loc_lon"
         const val KEY_SAVED_AT = "loc_saved_at"
+        const val MODE_AUTO = "auto"
+        const val MODE_MANUAL = "manual"
     }
 }
