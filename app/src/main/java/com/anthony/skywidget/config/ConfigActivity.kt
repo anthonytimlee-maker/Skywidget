@@ -54,9 +54,10 @@ class ConfigActivity : AppCompatActivity() {
         val lonInput = findViewById<EditText>(R.id.input_lon)
         val status = findViewById<TextView>(R.id.status)
 
-        findViewById<Button>(R.id.btn_use_device).setOnClickListener {
-            requestLocationPermissionOrFinish(status)
-        }
+       findViewById<Button>(R.id.btn_use_device).setOnClickListener {
+          LocationResolver(this).useDeviceLocation()
+          requestLocationPermissionOrFinish(status)
+       }
 
         findViewById<Button>(R.id.btn_save_manual).setOnClickListener {
             val lat = latInput.text.toString().toDoubleOrNull()
