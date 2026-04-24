@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  DIAGNOSTIC LAYOUT — STEP 6
-  Added: FrameLayout root wrapping a background ImageView (painted by the
-  renderer as a runtime-generated bitmap gradient) and the content row
-  above it.
+  FINAL LAYOUT — all polish attributes restored.
 
-  Purpose: verify that setImageViewBitmap works on a full-bleed ImageView
-  in RemoteViews, and that FrameLayout with two children (image + linear
-  layout) renders correctly.
+  From the working Step 6 baseline, added:
+   - android:fontFamily="sans-serif-medium" on headline TextViews
+   - android:includeFontPadding="false" to tighten vertical rhythm
+   - android:lineSpacingMultiplier="0.95" on the big temp
+   - <Space> elements replacing layout_marginStart between columns
+   - Real dimensions from Stage 1 (54sp temp, 13sp stats, 58dp hero icon, etc.)
+
+  NOT restored (known RemoteViews incompatibility):
+   - android:clipToOutline on the root FrameLayout. Corners come from the
+     bitmap's GradientDrawable.cornerRadius instead.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Background: dynamically-painted gradient bitmap. -->
     <ImageView
         android:id="@+id/background"
         android:layout_width="match_parent"
@@ -22,14 +25,15 @@
         android:contentDescription="@null"
         android:importantForAccessibility="no" />
 
-    <!-- Content row, same as Step 5 but with the solid-color background removed
-         (the gradient image below provides the color now). -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
         android:baselineAligned="false">
 
         <!-- Column 1: temp + H/L stacked -->
@@ -43,31 +47,39 @@
                 android:id="@+id/temp_now"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="36sp"
-                android:textColor="#FFFFFF"
+                android:textSize="54sp"
+                android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
+                android:lineSpacingMultiplier="0.95"
                 android:text="18°" />
 
             <TextView
                 android:id="@+id/temp_hl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="11sp"
-                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
+                android:alpha="0.85"
+                android:layout_marginTop="1dp"
                 android:text="21° / 9°" />
         </LinearLayout>
+
+        <Space
+            android:layout_width="14dp"
+            android:layout_height="0dp" />
 
         <!-- Column 2: weather icon + chips -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:layout_marginStart="14dp">
+            android:gravity="center_horizontal">
 
             <ImageView
                 android:id="@+id/ico_weather"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_width="58dp"
+                android:layout_height="58dp"
                 android:src="@drawable/ic_partly_cloudy_day"
                 android:contentDescription="@string/cd_weather_icon" />
 
@@ -76,11 +88,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="2dp">
+                android:layout_marginTop="4dp">
 
                 <ImageView
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
+                    android:id="@+id/ico_precip"
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
                     android:src="@drawable/ic_precip"
                     android:contentDescription="@null" />
 
@@ -88,48 +101,59 @@
                     android:id="@+id/precip_pct"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="11sp"
-                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:includeFontPadding="false"
                     android:layout_marginStart="3dp"
                     android:text="20%" />
 
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="0dp" />
+
                 <ImageView
                     android:id="@+id/ico_baro"
-                    android:layout_width="13dp"
-                    android:layout_height="13dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
                     android:src="@drawable/ic_baro_flat"
-                    android:layout_marginStart="6dp"
                     android:contentDescription="@string/cd_baro_trend" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Column 3: sun stats -->
+        <Space
+            android:layout_width="14dp"
+            android:layout_height="0dp" />
+
+        <!-- Column 3: sun stats, weight=1, left-aligned -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:gravity="start|center_vertical"
-            android:layout_marginStart="14dp">
+            android:gravity="start|center_vertical">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
+
                 <ImageView
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
+                    android:id="@+id/ico_sunrise"
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
                     android:src="@drawable/ic_sunrise"
                     android:contentDescription="@null" />
+
                 <TextView
                     android:id="@+id/sunrise"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginStart="5dp"
-                    android:text="—" />
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:includeFontPadding="false"
+                    android:layout_marginStart="6dp"
+                    android:text="6:12 AM" />
             </LinearLayout>
 
             <LinearLayout
@@ -137,20 +161,24 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="3dp">
+                android:layout_marginTop="5dp">
+
                 <ImageView
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
+                    android:id="@+id/ico_sunset"
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
                     android:src="@drawable/ic_sunset"
                     android:contentDescription="@null" />
+
                 <TextView
                     android:id="@+id/sunset"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginStart="5dp"
-                    android:text="—" />
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:includeFontPadding="false"
+                    android:layout_marginStart="6dp"
+                    android:text="7:48 PM" />
             </LinearLayout>
 
             <LinearLayout
@@ -158,23 +186,27 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="3dp">
+                android:layout_marginTop="5dp">
+
                 <ImageView
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
+                    android:id="@+id/ico_daylight"
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
                     android:src="@drawable/ic_daylight"
                     android:contentDescription="@null" />
+
                 <TextView
                     android:id="@+id/daylight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginStart="5dp"
-                    android:text="—" />
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:includeFontPadding="false"
+                    android:layout_marginStart="6dp"
+                    android:text="13h 36m" />
             </LinearLayout>
-
         </LinearLayout>
+
     </LinearLayout>
 
 </FrameLayout>
