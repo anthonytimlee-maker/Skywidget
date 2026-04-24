@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  FINAL LAYOUT — all polish attributes restored.
-
-  From the working Step 6 baseline, added:
-   - android:fontFamily="sans-serif-medium" on headline TextViews
-   - android:includeFontPadding="false" to tighten vertical rhythm
-   - android:lineSpacingMultiplier="0.95" on the big temp
-   - <Space> elements replacing layout_marginStart between columns
-   - Real dimensions from Stage 1 (54sp temp, 13sp stats, 58dp hero icon, etc.)
-
-  NOT restored (known RemoteViews incompatibility):
-   - android:clipToOutline on the root FrameLayout. Corners come from the
-     bitmap's GradientDrawable.cornerRadius instead.
+  Test 7.2 — <Space> elements removed, layout_marginStart used instead.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -64,16 +53,13 @@
                 android:text="21° / 9°" />
         </LinearLayout>
 
-        <Space
-            android:layout_width="14dp"
-            android:layout_height="0dp" />
-
         <!-- Column 2: weather icon + chips -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:layout_marginStart="14dp">
 
             <ImageView
                 android:id="@+id/ico_weather"
@@ -106,22 +92,15 @@
                     android:layout_marginStart="3dp"
                     android:text="20%" />
 
-                <Space
-                    android:layout_width="8dp"
-                    android:layout_height="0dp" />
-
                 <ImageView
                     android:id="@+id/ico_baro"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:src="@drawable/ic_baro_flat"
+                    android:layout_marginStart="8dp"
                     android:contentDescription="@string/cd_baro_trend" />
             </LinearLayout>
         </LinearLayout>
-
-        <Space
-            android:layout_width="14dp"
-            android:layout_height="0dp" />
 
         <!-- Column 3: sun stats, weight=1, left-aligned -->
         <LinearLayout
@@ -129,7 +108,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:gravity="start|center_vertical">
+            android:gravity="start|center_vertical"
+            android:layout_marginStart="14dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
