@@ -1,6 +1,8 @@
 package com.anthony.skywidget.widget
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.GradientDrawable
@@ -10,20 +12,21 @@ import com.anthony.skywidget.data.BarometerTrend
 import com.anthony.skywidget.data.WeatherCode
 
 /**
- * Final renderer.
+ * Builds the RemoteViews for the widget.
  *
- * Everything from Step 6 plus:
- *  - Dynamic text color driven by state.textArgb (dark on bright skies,
- *    light on dark skies; transitions around civil twilight).
- *  - ColorFilter applied to all tintable icons via RemoteViews.setInt so
- *    the vector strokes stay legible against any sky gradient.
+ * Responsibilities:
+ *  - Paint the sky gradient as a dynamic bitmap on the background ImageView.
+ *  - Set all text content from WidgetState.
+ *  - Dynamically tint text + tintable icons to stay legible on any sky.
+ *  - Swap weather and barometer icons based on current conditions.
+ *  - Wire a tap-to-refresh PendingIntent so touching the widget triggers
+ *    an immediate one-shot refresh via SkyWidgetProvider.
  */
 object WidgetRenderer {
 
     private const val GRADIENT_BITMAP_W = 540
     private const val GRADIENT_BITMAP_H = 220
 
-    // IDs we need to re-color at paint time.
     private val TEXT_IDS = intArrayOf(
         R.id.temp_now, R.id.temp_hl, R.id.precip_pct,
         R.id.sunrise, R.id.sunset, R.id.daylight
@@ -36,13 +39,13 @@ object WidgetRenderer {
     fun build(context: Context, state: WidgetState): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.sky_widget)
 
-        // Background gradient.
+        // Background gradient
         views.setImageViewBitmap(
             R.id.background,
             buildGradientBitmap(state.topGradientArgb, state.botGradientArgb)
         )
 
-        // Text content.
+        // Text content
         views.setTextViewText(R.id.temp_now, "${state.temperatureC}°")
         views.setTextViewText(R.id.temp_hl, "${state.highC}° / ${state.lowC}°")
         views.setTextViewText(R.id.precip_pct, "${state.precipPct}%")
@@ -50,21 +53,34 @@ object WidgetRenderer {
         views.setTextViewText(R.id.sunset, state.sunsetHhMm12)
         views.setTextViewText(R.id.daylight, state.daylightText)
 
-        // Dynamic text colors — dark for bright skies, light for dark skies.
+        // Dynamic text colors
         for (id in TEXT_IDS) {
             views.setTextColor(id, state.textArgb)
         }
 
-        // Tint the small icons to match. The hero weather icon keeps its
-        // authored colors (yellow sun, white cloud, etc.) — tinting it would
-        // flatten it into a silhouette.
+        // Tint small icons to match (not the hero weather icon — it keeps its colors)
         for (id in TINTABLE_ICON_IDS) {
             views.setInt(id, "setColorFilter", state.textArgb)
         }
 
-        // Dynamic icon swaps.
+        // Dynamic icon swaps
         views.setImageViewResource(R.id.ico_weather, iconForCondition(state.condition, state.isDaytime))
         views.setImageViewResource(R.id.ico_baro, barometerIcon(state.barometer))
+
+        // Tap-to-refresh. The PendingIntent points at SkyWidgetProvider with a
+        // custom ACTION_REFRESH; the provider's onReceive enqueues a one-shot
+        // RefreshWorker. FLAG_IMMUTABLE is required for Android 12+.
+        val tapIntent = Intent(context, SkyWidgetProvider::class.java).apply {
+            action = SkyWidgetProvider.ACTION_REFRESH
+        }
+        val pending = PendingIntent.getBroadcast(
+            context, 0, tapIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        // Attach the click to the background ImageView so the entire widget
+        // surface is tappable. The press-state overlay on that view gives
+        // subtle dim feedback when pressed.
+        views.setOnClickPendingIntent(R.id.background, pending)
 
         return views
     }
